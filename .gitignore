@@ -1,4 +1,4 @@
-.terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.backup
-.terraform/
+Azure-Resource-Group/.terraform.lock.hcl
+Azure-Resource-Group/terraform.tfstate
+Azure-Resource-Group/terraform.tfstate.backup
+Azure-Resource-Group/.terraform/

@@ -19,3 +19,12 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
   tags     = var.tags
 }
+
+#Create vNet
+resource "azurerm_virtual_network" "vnet" {
+  name                = var.azurerm_virtual_network
+  address_space       = ["10.0.0.0/16"]
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
+}
