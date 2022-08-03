@@ -3,7 +3,7 @@ variable "resource_group_name" {
 }
 
 variable "location" {
-  default = "eastus"
+  default = "westindia"
 }
 
 variable "tags" {
@@ -11,7 +11,6 @@ variable "tags" {
     Environment       = "Dev"
     Application_Name  = "Terraform Template"
     Application_Owner = "Ghansham Mahajan"
-    Cost_Center       = "ABCD"
   }
 
 }
