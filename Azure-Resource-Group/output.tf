@@ -10,17 +10,24 @@ output "resource_group_location" {
   value = azurerm_resource_group.rg.location
 }
 
-output "azurerm_virtual_network" {
+output "virtual_network" {
   value = azurerm_virtual_network.vnet.name
 }
 
-output "azurerm_virtual_network" {
+output "virtual_network_location" {
   value = azurerm_virtual_network.vnet.location
 }
 
-output "resource_group_id" {
+output "virtual_network_id" {
   value = azurerm_virtual_network.vnet.id
 }
 
+output "vnet_address_space" {
+  value       = azurerm_virtual_network.vnet.address_space
+}
+
+output "vnet_subnets" {
+  value       = azurerm_subnet.subnet.*.id
+}
 
 
