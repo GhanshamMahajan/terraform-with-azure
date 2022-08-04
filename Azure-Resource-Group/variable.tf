@@ -1,5 +1,5 @@
 variable "virtual_machine_count" {
-  default = "3"
+  default = "2"
 }
 
 variable "resource_group_name" {
