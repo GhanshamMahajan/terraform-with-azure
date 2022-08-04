@@ -1,5 +1,19 @@
 # terraform-with-azure
-### Authenticate using the Azure CLI
+
+## Install Terraform for Windows
+1. [Download Terraform](https://www.terraform.io/downloads.html). This article was tested using Terraform version 1.1.4.
+
+2. From the download, extract the executable to a directory of your choosing (for example, c:\terraform).
+
+3. [Update your system's global path](https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows) to the executable.
+
+4. Open a terminal in VS Code.
+
+5. Verify the global path configuration with the terraform command.
+
+         terraform -version
+
+# Authenticate using the Azure CLI
 
 Terraform must authenticate to Azure to create infrastructure.
 In your terminal, use the Azure CLI tool to setup your account permissions locally.
@@ -9,7 +23,7 @@ In your terminal, use the Azure CLI tool to setup your account permissions local
 # set the account with the Azure CLI
 Once you have chosen the account subscription ID, set the account with the Azure CLI.
 
-    az account set --subscription "35akss-subscription-id"
+    az account set --subscription "subscription-id"
 
 # Create a Service Principal
 create a Service Principal. A Service Principal is an application within Azure Active Directory with the authentication tokens Terraform needs to perform actions on your behalf. Update the <SUBSCRIPTION_ID> with the subscription ID you specified in the previous step.
@@ -24,7 +38,8 @@ HashiCorp recommends setting these values as environment variables rather than s
     $ $Env:ARM_SUBSCRIPTION_ID = "<SUBSCRIPTION_ID>"
     $ $Env:ARM_TENANT_ID = "<TENANT_VALUE>"
 
-# Write configuration
+
+# Write configuration for terraform
 Create a folder called learn-terraform-azure.
 
     New-Item -Path "c:\" -Name "terraform-with-azure" -ItemType "directory"
@@ -89,4 +104,3 @@ When you apply your configuration, Terraform writes data into a file called terr
 To review the information in your state file, use the state command. If you have a long state file, you can see a list of the resources you created with Terraform by using the list subcommand
 
     terraform state list
-
