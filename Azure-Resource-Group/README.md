@@ -1,13 +1,21 @@
 To Build the VM we have to create below resources
 
 Create a virtual network
+
 Create a subnet
+
 Create a public IP address
+
 Create a network security group and SSH inbound rule
+
 Create a virtual network interface card
+
 Create a storage account for boot diagnostics
+
 Create SSH key
+
 Create a virtual machine
+
 Use SSH to connect to virtual machine
 
 # Azure - Resource Group Module

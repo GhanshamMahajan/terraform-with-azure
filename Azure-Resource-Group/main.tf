@@ -20,6 +20,23 @@ resource "azurerm_resource_group" "rg" {
   tags     = var.tags
 }
 
+#Create vNet
+resource "azurerm_virtual_network" "vnet" {
+  name                = var.virtual_network
+  address_space       = var.address_space
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+#Create subnet
+resource "azurerm_subnet" "subnet" {
+  name                 = var.subnet_names
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = var.subnet_prefixes
+}
+
+#Create NSG (Network Security Group)
 resource "azurerm_network_security_group" "nsg" {
   name                = var.network_security_group
   location            = azurerm_resource_group.rg.location
@@ -39,37 +56,19 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
-#Create vNet
-resource "azurerm_virtual_network" "vnet" {
-  name                = var.virtual_network
-  address_space       = var.address_space
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-  tags                = var.tags
-}
-
-resource "azurerm_subnet" "subnet" {
-  name                 = var.subnet_names
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = var.subnet_prefixes
-}
-
-# Create public IPs
-resource "azurerm_public_ip" "pip" {
-  count               = 2
-  name                = "${var.resource_prefix}${count.index}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+#Assign NSG to Subnet
+resource "azurerm_subnet_network_security_group_association" "nsgsub" {
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 # Create network interface
 resource "azurerm_network_interface" "nic" {
-  count               = 2
+  count               = var.virtual_machine_count
   name                = "${var.resource_prefix}${count.index}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  tags                = var.tags
 
   ip_configuration {
     name                          = "myNic"
@@ -77,6 +76,26 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.pip[count.index].id
   }
+}
+
+# Create public IPs
+resource "azurerm_public_ip" "pip" {
+  count               = var.virtual_machine_count
+  name                = "${var.resource_prefix}${count.index}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+  tags                = var.tags
+}
+# Create Availability Set
+resource "azurerm_availability_set" "avset" {
+  name                         = var.azure_availability_set
+  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = azurerm_resource_group.rg.name
+  platform_fault_domain_count  = 2
+  platform_update_domain_count = 2
+  managed                      = true
+  tags                         = var.tags
 }
 
 # Generate random text for a unique storage account name
@@ -96,6 +115,7 @@ resource "azurerm_storage_account" "stg" {
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  tags                     = var.tags
 }
 
 # Create (and display) an SSH key
@@ -106,12 +126,14 @@ resource "tls_private_key" "private-ssh-key" {
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
-  count                 = 2
+  count                 = var.virtual_machine_count
   name                  = "${var.resource_prefix}${count.index}"
   location              = azurerm_resource_group.rg.location
+  availability_set_id   = azurerm_availability_set.avset.id
   resource_group_name   = azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.nic[count.index].id]
   size                  = "Standard_B1ls"
+  tags                  = var.tags
 
   os_disk {
     name                 = "${var.resource_prefix}${count.index}"

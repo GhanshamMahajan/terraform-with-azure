@@ -1,3 +1,7 @@
+variable "virtual_machine_count" {
+  default = "3"
+}
+
 variable "resource_group_name" {
   default = "ghansham-mahajan-rg"
 }
@@ -61,4 +65,8 @@ variable "sku" {
 
 variable "osadminuser" {
   default = "osadmin"
+}
+
+variable "azure_availability_set" {
+  default = "OMWEIASDEVPAVS01"
 }
