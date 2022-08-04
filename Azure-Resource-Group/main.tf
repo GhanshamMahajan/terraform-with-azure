@@ -25,6 +25,18 @@ resource "azurerm_network_security_group" "nsg" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   tags                = var.tags
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
 
 #Create vNet
@@ -37,9 +49,93 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  count                = length(var.subnet_names)
-  name                 = var.subnet_names[count.index]
+  name                 = var.subnet_names
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_prefixes[count.index]]
+  address_prefixes     = var.subnet_prefixes
+}
+
+# Create public IPs
+resource "azurerm_public_ip" "pip" {
+  count               = 2
+  name                = "${var.resource_prefix}${count.index}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
+# Create network interface
+resource "azurerm_network_interface" "nic" {
+  count               = 2
+  name                = "${var.resource_prefix}${count.index}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "myNic"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pip[count.index].id
+  }
+}
+
+# Generate random text for a unique storage account name
+resource "random_id" "randomId" {
+  keepers = {
+    # Generate a new ID only when a new resource group is defined
+    resource_group = azurerm_resource_group.rg.name
+  }
+
+  byte_length = 8
+}
+
+# Create storage account for boot diagnostics
+resource "azurerm_storage_account" "stg" {
+  name                     = "diag${random_id.randomId.hex}"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+# Create (and display) an SSH key
+resource "tls_private_key" "private-ssh-key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "vm" {
+  count                 = 2
+  name                  = "${var.resource_prefix}${count.index}"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.nic[count.index].id]
+  size                  = "Standard_B1ls"
+
+  os_disk {
+    name                 = "${var.resource_prefix}${count.index}"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+
+  source_image_reference {
+    publisher = var.os_publisher
+    offer     = var.offer
+    sku       = var.sku
+    version   = "latest"
+  }
+
+  computer_name                   = "${var.resource_prefix}${count.index}"
+  admin_username                  = var.osadminuser
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = var.osadminuser
+    public_key = tls_private_key.private-ssh-key.public_key_openssh
+  }
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.stg.primary_blob_endpoint
+  }
 }

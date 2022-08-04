@@ -7,7 +7,7 @@ variable "virtual_network" {
 }
 
 variable "location" {
-  default = "westindia"
+  default = "eastus"
 }
 
 variable "tags" {
@@ -32,5 +32,33 @@ variable "subnet_prefixes" {
 }
 
 variable "subnet_names" {
-  default = ["subnet1"]
+  default = "subnet"
+}
+
+variable "public_ip_name" {
+  default = "Ghansham-Mahajan-PIP"
+}
+
+variable "nic_name" {
+  default = "ghansham_mahajan_nic"
+}
+
+variable "resource_prefix" {
+  default = "OMWEIASDEVPAP"
+}
+
+variable "os_publisher" {
+  default = "Canonical"
+}
+
+variable "offer" {
+  default = "UbuntuServer"
+}
+
+variable "sku" {
+  default = "18.04-LTS"
+}
+
+variable "osadminuser" {
+  default = "osadmin"
 }

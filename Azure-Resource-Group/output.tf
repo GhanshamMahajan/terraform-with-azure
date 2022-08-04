@@ -23,11 +23,15 @@ output "virtual_network_id" {
 }
 
 output "vnet_address_space" {
-  value       = azurerm_virtual_network.vnet.address_space
+  value = azurerm_virtual_network.vnet.address_space
 }
 
 output "vnet_subnets" {
-  value       = azurerm_subnet.subnet.*.id
+  value = azurerm_subnet.subnet.*.id
 }
 
 
+output "tls_private_key" {
+  value     = tls_private_key.private-ssh-key.private_key_pem
+  sensitive = true
+}
