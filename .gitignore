@@ -2,3 +2,8 @@ Linux-Virtual-Machine/.terraform.lock.hcl
 Linux-Virtual-Machine/terraform.tfstate
 Linux-Virtual-Machine/terraform.tfstate.backup
 Linux-Virtual-Machine/.terraform/
+
+AKS/.terraform.lock.hcl
+AKS/terraform.tfstate
+AKS/terraform.tfstate.backup
+AKS/.terraform/
