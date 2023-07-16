@@ -7,3 +7,9 @@ AKS/.terraform.lock.hcl
 AKS/terraform.tfstate
 AKS/terraform.tfstate.backup
 AKS/.terraform/
+
+
+linux_webapp/.terraform.lock.hcl
+linux_webapp/terraform.tfstate
+linux_webapp/terraform.tfstate.backup
+linux_webapp/.terraform/

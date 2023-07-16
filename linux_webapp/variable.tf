@@ -11,13 +11,13 @@ variable "os_type" {
 }
 
 variable "sku_name" {
-  default = "Free"
+  default = "F1"
 }
 
 variable "service_plan_name" {
-  default = "asp_ghan_dev_global_001"
+  default = "asp-ghan-dev-global-001"
 }
 
 variable "linux_web_name" {
-  default = "lwp_ghan_dev_global_001"
+  default = "lwp-ghan-dev-global-001"
 }
